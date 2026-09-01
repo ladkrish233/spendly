@@ -29,6 +29,8 @@ spendly/
 - DB logic → `database/db.py` only, never inline in routes
 - New pages → new `.html` file extending `base.html`
 - Page-specific styles → new `.css` file, not inline `<style>` tags
+- Page-specific JS → inline in that template's `{% block scripts %}` (see the video modal in `landing.html`), not `main.js` — only promote JS to `main.js` once it's actually shared across pages
+- `login.html` and `register.html` already `POST` to `/login` and `/register` — there are no handlers for these yet, so implement both together when building auth (Step 3/4 territory)
 
 ---
 
@@ -102,6 +104,13 @@ pytest -s
 | `GET /expenses/<id>/delete` | Stub — Step 9 |
 
 **Do not implement a stub route unless the active task explicitly targets that step.**
+
+---
+
+## Git conventions
+
+- Commit messages follow `<area>: <summary>`, e.g. `landing: redesign hero section to match mockup`
+- When a task targets one section/page, touch only the files that section needs — don't drift into unrelated cleanup
 
 ---
 
