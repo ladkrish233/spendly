@@ -1,0 +1,209 @@
+.profile-section {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: var(--max-width);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Account header */
+
+.profile-account-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+}
+
+.profile-avatar {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--paper-card);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-account-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.profile-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--ink);
+}
+
+.profile-email {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+}
+
+.profile-member-since {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+}
+
+/* Stat cards */
+
+.profile-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+.profile-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+}
+
+.profile-stat-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.profile-stat-value {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--ink);
+}
+
+/* Panels */
+
+.profile-panels-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 1.25rem;
+}
+
+.profile-panel {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+}
+
+.profile-panel-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 0 0 1rem;
+}
+
+.profile-empty {
+    font-family: var(--font-body);
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Recent transactions table */
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+}
+
+.profile-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding: 0 0 0.6rem;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.profile-table td {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--ink-soft);
+}
+
+.profile-table tr:last-child td {
+    border-bottom: none;
+}
+
+.profile-category-pill {
+    display: inline-block;
+    background: var(--accent-2-light);
+    color: var(--accent-2);
+    border-radius: var(--radius-sm);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+/* Category breakdown bars */
+
+.profile-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.profile-category-row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.profile-category-name {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+.profile-category-bar-track {
+    background: var(--border-soft);
+    border-radius: var(--radius-sm);
+    height: 8px;
+    overflow: hidden;
+}
+
+.profile-category-bar {
+    background: var(--accent);
+    height: 100%;
+    border-radius: var(--radius-sm);
+}
+
+.profile-category-amount {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    text-align: right;
+}
+
+@media (max-width: 720px) {
+    .profile-panels-row {
+        grid-template-columns: 1fr;
+    }
+}
