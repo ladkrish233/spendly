@@ -20,6 +20,31 @@
             </div>
         </div>
 
+        <form class="profile-filter-form" method="GET" action="{{ url_for('profile') }}">
+            <div class="profile-filter-field">
+                <label for="start_date">From</label>
+                <input type="date" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            <div class="profile-filter-field">
+                <label for="end_date">To</label>
+                <input type="date" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <button type="submit" class="profile-filter-submit">Filter</button>
+            {% if filter_start or filter_end %}
+            <a href="{{ url_for('profile') }}" class="profile-filter-clear">Clear</a>
+            {% endif %}
+        </form>
+
+        {% if filter_start or filter_end %}
+        <p class="profile-filter-note">
+            Showing expenses
+            {% if filter_start and filter_end %}from {{ filter_start }} to {{ filter_end }}
+            {% elif filter_start %}from {{ filter_start }} onward
+            {% else %}up to {{ filter_end }}
+            {% endif %}
+        </p>
+        {% endif %}
+
         <div class="profile-stats-row">
             <div class="profile-stat-card">
                 <span class="profile-stat-label">Total spent</span>

@@ -44,19 +44,36 @@ def create_user(name, email, password_hash):
     return user_id
 
 
-def get_expense_summary(user_id):
+def _build_date_filter(user_id, start_date, end_date):
+    clauses = ["user_id = ?"]
+    params = [user_id]
+    if start_date:
+        clauses.append("date >= ?")
+        params.append(start_date)
+    if end_date:
+        clauses.append("date <= ?")
+        params.append(end_date)
+    return " AND ".join(clauses), tuple(params)
+
+
+def get_expense_summary(user_id, start_date=None, end_date=None):
     conn = get_db()
+
+    # where_clause is built from hardcoded fragments only ("user_id = ?",
+    # "date >= ?", "date <= ?") — never from user input — so splicing it
+    # in below is safe; actual values still flow through the `?` params.
+    where_clause, params = _build_date_filter(user_id, start_date, end_date)
 
     totals = conn.execute(
         "SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS count "
-        "FROM expenses WHERE user_id = ?",
-        (user_id,),
+        f"FROM expenses WHERE {where_clause}",
+        params,
     ).fetchone()
 
     by_category_rows = conn.execute(
         "SELECT category, SUM(amount) AS total FROM expenses "
-        "WHERE user_id = ? GROUP BY category ORDER BY total DESC",
-        (user_id,),
+        f"WHERE {where_clause} GROUP BY category ORDER BY total DESC",
+        params,
     ).fetchall()
 
     conn.close()
@@ -75,12 +92,13 @@ def get_expense_summary(user_id):
     }
 
 
-def get_recent_expenses(user_id, limit=5):
+def get_recent_expenses(user_id, limit=5, start_date=None, end_date=None):
     conn = get_db()
+    where_clause, params = _build_date_filter(user_id, start_date, end_date)
     rows = conn.execute(
-        "SELECT * FROM expenses WHERE user_id = ? "
+        f"SELECT * FROM expenses WHERE {where_clause} "
         "ORDER BY date DESC, id DESC LIMIT ?",
-        (user_id, limit),
+        params + (limit,),
     ).fetchall()
     conn.close()
     return rows
