@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from flask import Flask, redirect, render_template, request, session, url_for
@@ -16,6 +17,34 @@ from database.db import (
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key-change-in-production"
+
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _parse_date_filter(args):
+    start_raw = args.get("start_date", "").strip()
+    end_raw = args.get("end_date", "").strip()
+    if not start_raw and not end_raw:
+        return None, None
+
+    def _valid(value):
+        if not value:
+            return True
+        if not DATE_RE.match(value):
+            return False
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            return False
+        return True
+
+    if not _valid(start_raw) or not _valid(end_raw):
+        return None, None
+
+    start_date, end_date = start_raw or None, end_raw or None
+    if start_date and end_date and start_date > end_date:
+        return None, None
+    return start_date, end_date
 
 
 # ------------------------------------------------------------------ #
@@ -98,14 +127,21 @@ def profile():
     member_since = datetime.strptime(
         user["created_at"], "%Y-%m-%d %H:%M:%S"
     ).strftime("%B %Y")
-    summary = get_expense_summary(user_id)
-    recent_expenses = get_recent_expenses(user_id)
+    start_date, end_date = _parse_date_filter(request.args)
+    summary = get_expense_summary(
+        user_id, start_date=start_date, end_date=end_date
+    )
+    recent_expenses = get_recent_expenses(
+        user_id, start_date=start_date, end_date=end_date
+    )
     return render_template(
         "profile.html",
         user=user,
         member_since=member_since,
         summary=summary,
         recent_expenses=recent_expenses,
+        filter_start=start_date,
+        filter_end=end_date,
     )
 
 
