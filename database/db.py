@@ -14,6 +14,16 @@ def get_db():
     return conn
 
 
+def get_user_by_id(user_id):
+    conn = get_db()
+    user = conn.execute(
+        "SELECT id, name, email, created_at FROM users WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+    conn.close()
+    return user
+
+
 def init_db():
     conn = get_db()
     conn.execute("""
