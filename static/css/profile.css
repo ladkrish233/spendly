@@ -1,0 +1,21 @@
+.profile-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.profile-field:last-child {
+    border-bottom: none;
+}
+
+.profile-label {
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+}
+
+.profile-value {
+    color: var(--ink);
+    font-weight: 500;
+}

@@ -1,8 +1,11 @@
-from flask import Flask, render_template
+from datetime import datetime
 
-from database.db import get_db, init_db, seed_db
+from flask import Flask, redirect, render_template, session, url_for
+
+from database.db import get_db, get_user_by_id, init_db, seed_db
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key-change-in-production"
 
 
 # ------------------------------------------------------------------ #
@@ -45,7 +48,20 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    user = get_user_by_id(user_id)
+    if user is None:
+        session.pop("user_id", None)
+        return redirect(url_for("login"))
+
+    member_since = datetime.strptime(
+        user["created_at"], "%Y-%m-%d %H:%M:%S"
+    ).strftime("%B %d, %Y")
+
+    return render_template("profile.html", user=user, member_since=member_since)
 
 
 @app.route("/expenses/add")
