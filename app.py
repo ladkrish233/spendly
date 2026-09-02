@@ -1,19 +1,21 @@
 import re
 from datetime import datetime
 
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, abort, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database import db
 from database.db import (
     create_user,
     get_db,
+    get_expense_by_id,
     get_expense_summary,
     get_recent_expenses,
     get_user_by_email,
     get_user_by_id,
     init_db,
     seed_db,
+    update_expense,
 )
 
 app = Flask(__name__)
@@ -203,9 +205,68 @@ def add_expense():
     return redirect(url_for("profile"))
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    expense = get_expense_by_id(id, user_id)
+    if expense is None:
+        abort(404)
+
+    if request.method == "GET":
+        return render_template(
+            "expenses_edit.html", categories=CATEGORIES, expense=expense
+        )
+
+    amount_raw = request.form.get("amount", "")
+    category_raw = request.form.get("category", "")
+    date_raw = request.form.get("date", "")
+    description_raw = request.form.get("description", "")
+    form = {
+        "amount": amount_raw,
+        "category": category_raw,
+        "date": date_raw,
+        "description": description_raw,
+    }
+
+    try:
+        amount = float(amount_raw)
+        if amount <= 0:
+            raise ValueError
+    except ValueError:
+        return render_template(
+            "expenses_edit.html",
+            categories=CATEGORIES,
+            expense=expense,
+            error="Enter a valid amount greater than 0.",
+            form=form,
+        )
+
+    category = category_raw.strip()
+    if not category or category not in CATEGORIES:
+        return render_template(
+            "expenses_edit.html",
+            categories=CATEGORIES,
+            expense=expense,
+            error="Select a valid category.",
+            form=form,
+        )
+
+    date = date_raw.strip()
+    if not date or not DATE_RE.match(date):
+        return render_template(
+            "expenses_edit.html",
+            categories=CATEGORIES,
+            expense=expense,
+            error="Enter a valid date.",
+            form=form,
+        )
+
+    description = description_raw.strip() or None
+    update_expense(id, user_id, amount, category, date, description)
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/delete")
