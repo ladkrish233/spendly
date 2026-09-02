@@ -64,6 +64,12 @@ def login():
     return redirect(url_for("profile"))
 
 
+@app.route("/logout")
+def logout():
+    session.pop("user_id", None)
+    return redirect(url_for("login"))
+
+
 @app.route("/terms")
 def terms():
     return render_template("terms.html")
