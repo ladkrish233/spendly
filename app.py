@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from database import db
 from database.db import (
     create_user,
     get_db,
@@ -19,6 +20,8 @@ app = Flask(__name__)
 app.secret_key = "dev-secret-key-change-in-production"
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
 
 
 def _parse_date_filter(args):
@@ -96,7 +99,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop("user_id", None)
-    return redirect(url_for("login"))
+    return redirect(url_for("landing"))
 
 
 @app.route("/terms")
@@ -112,12 +115,6 @@ def privacy():
 # ------------------------------------------------------------------ #
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
-
-@app.route("/logout")
-def logout():
-    session.pop("user_id", None)
-    return redirect(url_for("landing"))
-
 
 @app.route("/profile")
 def profile():
@@ -151,9 +148,59 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    user_id = session.get("user_id")
+    if user_id is None:
+        return redirect(url_for("login"))
+
+    if request.method == "GET":
+        return render_template("expenses_add.html", categories=CATEGORIES)
+
+    amount_raw = request.form.get("amount", "")
+    category_raw = request.form.get("category", "")
+    date_raw = request.form.get("date", "")
+    description_raw = request.form.get("description", "")
+    form = {
+        "amount": amount_raw,
+        "category": category_raw,
+        "date": date_raw,
+        "description": description_raw,
+    }
+
+    try:
+        amount = float(amount_raw)
+        if amount <= 0:
+            raise ValueError
+    except ValueError:
+        return render_template(
+            "expenses_add.html",
+            categories=CATEGORIES,
+            error="Enter a valid amount greater than 0.",
+            form=form,
+        )
+
+    category = category_raw.strip()
+    if not category or category not in CATEGORIES:
+        return render_template(
+            "expenses_add.html",
+            categories=CATEGORIES,
+            error="Select a valid category.",
+            form=form,
+        )
+
+    date = date_raw.strip()
+    if not date or not DATE_RE.match(date):
+        return render_template(
+            "expenses_add.html",
+            categories=CATEGORIES,
+            error="Enter a valid date.",
+            form=form,
+        )
+
+    description = description_raw.strip() or None
+    db.add_expense(user_id, amount, category, date, description)
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/edit")
