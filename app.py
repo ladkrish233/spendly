@@ -1,9 +1,13 @@
+from datetime import datetime
+
 from flask import Flask, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import (
     create_user,
     get_db,
+    get_expense_summary,
+    get_recent_expenses,
     get_user_by_email,
     get_user_by_id,
     init_db,
@@ -91,8 +95,18 @@ def profile():
         session.pop("user_id", None)
         return redirect(url_for("login"))
 
-    member_since = user["created_at"].split(" ")[0]
-    return render_template("profile.html", user=user, member_since=member_since)
+    member_since = datetime.strptime(
+        user["created_at"], "%Y-%m-%d %H:%M:%S"
+    ).strftime("%B %Y")
+    summary = get_expense_summary(user_id)
+    recent_expenses = get_recent_expenses(user_id)
+    return render_template(
+        "profile.html",
+        user=user,
+        member_since=member_since,
+        summary=summary,
+        recent_expenses=recent_expenses,
+    )
 
 
 @app.route("/expenses/add")
