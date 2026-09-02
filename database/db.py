@@ -104,6 +104,18 @@ def get_recent_expenses(user_id, limit=5, start_date=None, end_date=None):
     return rows
 
 
+def add_expense(user_id, amount, category, date, description):
+    conn = get_db()
+    cursor = conn.execute(
+        "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+        (user_id, amount, category, date, description),
+    )
+    conn.commit()
+    expense_id = cursor.lastrowid
+    conn.close()
+    return expense_id
+
+
 def init_db():
     conn = get_db()
     conn.execute("""

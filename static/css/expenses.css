@@ -1,0 +1,10 @@
+/* ------------------------------------------------------------------ */
+/* Add expense page                                                    */
+/* ------------------------------------------------------------------ */
+
+.expense-description {
+    resize: vertical;
+    min-height: 90px;
+    font-family: var(--font-body);
+    line-height: 1.5;
+}
