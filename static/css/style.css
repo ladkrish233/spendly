@@ -53,6 +53,26 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
+.profile-table td form {
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.link-button {
+    display: inline;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+}
+
 /* ------------------------------------------------------------------ */
 /* Navbar                                                              */
 /* ------------------------------------------------------------------ */
